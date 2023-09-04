@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.wanted.breadcrumbs.mapper.BoardMapper">
-  <insert id="insertBoard" parameterType="com.wanted.breadcrumbs.entity.Board">
-    INSERT INTO board (title, description, parent_id, sub_board_list_ids)
-    VALUES (#{title}, #{description}, #{parentId}, #{subBoardListIds, typeHandler=org.apache.ibatis.type.ArrayTypeHandler})
+<mapper namespace="com.wanted.breadcrumbs.mapper.BoardRepository">
+  <insert id="insertBoard" parameterType="com.wanted.breadcrumbs.entity.board.Board">
+    INSERT INTO board (title, contents, parent_id) VALUES (#{title}, #{contents}, #{parentId})
   </insert>
 
-  <select id="getBoardById" parameterType="java.lang.Long" resultType="com.wanted.breadcrumbs.entity.Board">
+  <select id="getBoardById" parameterType="Long" resultType="com.wanted.breadcrumbs.entity.board.Board">
     SELECT * FROM board WHERE id = #{id}
+  </select>
+
+  <select id="getChildById" parameterType="Long" resultType="com.wanted.breadcrumbs.entity.board.Board">
+    SELECT * FROM board b JOIN board c ON b.id = c.parent_id WHERE b.id = #{id}
   </select>
 
 </mapper>
