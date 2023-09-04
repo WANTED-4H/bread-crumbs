@@ -1,9 +1,8 @@
 package com.wanted.breadcrumbs.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -15,5 +14,5 @@ public class Board {
     private String title;
     private String description;
     private Long parentId;
-    private Integer[] subBoardListIds;
+
 }
