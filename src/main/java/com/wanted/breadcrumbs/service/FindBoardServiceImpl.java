@@ -58,21 +58,21 @@ public class FindBoardServiceImpl implements FindBoardService{
     @Override
     public List<Board> findBreadCrumbsById(Long id) {
         //캐시에서 존재하면 캐시에서
-        LinkedHashMap<Long, Board> boardMap = new LinkedHashMap<>();
+        LinkedHashMap<Long, Board> breadCrumbsMap = new LinkedHashMap<>();
 
         Board findMe = getMyBean().findBoardByIdFromDB(id); // 캐시에서 찾기
 
-        boardMap.put(findMe.getId(), findMe);
+        breadCrumbsMap.put(findMe.getId(), findMe);
 
         Board parentBoard = getMyBean().findBoardByIdFromDB(findMe.getParentId()); // 캐시에서 찾기
 
-        while(parentBoard != null && !boardMap.containsKey(parentBoard.getParentId())) {
-            boardMap.put(parentBoard.getId(), parentBoard);
+        while(parentBoard != null && !breadCrumbsMap.containsKey(parentBoard.getId())) {
+            breadCrumbsMap.put(parentBoard.getId(), parentBoard);
             parentBoard = getMyBean().findBoardByIdFromDB(parentBoard.getParentId());
         }
 
         List<Board> toList = new ArrayList<>();
-        for(Map.Entry<Long, Board> entry : boardMap.entrySet()) {
+        for(Map.Entry<Long, Board> entry : breadCrumbsMap.entrySet()) {
             System.out.println(entry.getValue());
             toList.add(entry.getValue());
         }
