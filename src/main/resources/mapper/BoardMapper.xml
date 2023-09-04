@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wanted.breadcrumbs.mapper.BoardMapper">
+
   <insert id="insertBoard" parameterType="com.wanted.breadcrumbs.entity.Board">
-    INSERT INTO board (title, description, parent_id, sub_board_list_ids)
-    VALUES (#{title}, #{description}, #{parentId}, #{subBoardListIds, typeHandler=org.apache.ibatis.type.ArrayTypeHandler})
+    INSERT INTO board (title, content, parent_id)
+    VALUES (#{title}, #{content}, #{parentId})
   </insert>
 
-  <select id="getBoardById" parameterType="java.lang.Long" resultType="com.wanted.breadcrumbs.entity.Board">
-    SELECT * FROM board WHERE id = #{id}
+  <select id="getBoardById" parameterType="Long" resultType="com.wanted.breadcrumbs.entity.Board">
+    SELECT id, title, content, parent_id FROM board WHERE id = #{id}
   </select>
+
+  <select id="findParentBoard" resultType="com.wanted.breadcrumbs.entity.Board">
+    SELECT * FROM board WHERE id = #{parentId}
+  </select>
+
+  <select id="getChildBoards" parameterType="Long" resultType="com.wanted.breadcrumbs.entity.Board">
+    SELECT * FROM board WHERE parent_id = #{parentId}
+  </select>
+
+  <select id="getBreadcrumbsPath" resultType="com.wanted.breadcrumbs.entity.Board">
+    WITH RECURSIVE cte(id, title, content, parent_id, depth) AS (
+    SELECT id, title, content, parent_id, 0 AS depth
+    FROM board
+    WHERE id = 5
+    UNION ALL
+    SELECT b.id, b.title, b.content, b.parent_id, cte.depth + 1
+    FROM board b
+    INNER JOIN cte ON b.id = cte.parent_id
+    )
+    SELECT id, title, content, parent_id
+    FROM cte
+    ORDER BY id ASC
+  </select>
+
 
 </mapper>
