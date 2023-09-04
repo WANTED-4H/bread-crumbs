@@ -25,4 +25,14 @@ public class BoardController {
         return new ResponseEntity<>(createdBoard, HttpStatus.CREATED);
     }
 
+    @GetMapping("/{boardId}")
+    public ResponseEntity<BoardDetail> getBoardWithBreadcrumbs(@PathVariable Long boardId) {
+        Board board = boardService.getBoard(boardId);
+        List<Board> childBoards = boardService.getChildBoards(boardId);
+        List<Board> breadcrumbsPath = boardService.findBreadcrumbs(board);
+
+        BoardDetail boardDetail = new BoardDetail(board, childBoards, breadcrumbsPath);
+        return new ResponseEntity<>(boardDetail, HttpStatus.OK);
+    }
+
 }

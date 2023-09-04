@@ -24,4 +24,37 @@ public class BoardService {
         return board;
     }
 
+    public Board getBoard(Long boardId) {
+        return boardMapper.getBoardById(boardId);
+    }
+
+    public List<Board> findBreadcrumbs(Board currentBoard) {
+        List<Board> breadcrumbs = new ArrayList<>();
+        breadcrumbs.add(currentBoard);
+        System.out.println(currentBoard.getDescription());
+
+        while (currentBoard.getParentId() != null && currentBoard.getId() != currentBoard.getParentId()) {
+            Board parentBoard = boardMapper.getBoardById(currentBoard.getParentId());
+            System.out.println(currentBoard.getParentId());
+            if (parentBoard == null) {
+                break;
+            }
+            breadcrumbs.add(parentBoard);
+            currentBoard = parentBoard;
+        }
+
+        Collections.reverse(breadcrumbs);
+
+        return breadcrumbs;
+    }
+    public List<Board> getChildBoards(Long parentId) {
+        List<Board> childBoards = boardMapper.getChildBoards(parentId);
+        if (childBoards == null) {
+            return Collections.emptyList();
+        }
+
+        return childBoards;
+    }
+
+
 }

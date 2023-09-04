@@ -10,4 +10,6 @@ public interface BoardMapper {
     void insertBoard(Board board);
     Board getBoardById(Long id);
     // 다른 필요한 메소드들 추가 가능
+    List<Board> getBreadcrumbsPath(Long boardId);
+    List<Board> getChildBoards(Long parentId);
 }
