@@ -27,6 +27,11 @@ public class BoardService {
     public Board getBoard(Long boardId) {
         return boardMapper.getBoardById(boardId);
     }
+    public List<Board> getBreadcrumbsPath(Long boardId) {
+        List<Board> breadcrumbsPath = boardMapper.getBreadcrumbsPath(boardId);
+
+        return breadcrumbsPath;
+    }
 
     public List<Board> findBreadcrumbs(Board currentBoard) {
         List<Board> breadcrumbs = new ArrayList<>();

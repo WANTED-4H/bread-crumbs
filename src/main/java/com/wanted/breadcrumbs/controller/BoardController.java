@@ -29,8 +29,10 @@ public class BoardController {
     public ResponseEntity<BoardDetail> getBoardWithBreadcrumbs(@PathVariable Long boardId) {
         Board board = boardService.getBoard(boardId);
         List<Board> childBoards = boardService.getChildBoards(boardId);
-        List<Board> breadcrumbsPath = boardService.findBreadcrumbs(board);
-
+        // 1. DB에서 가져오기
+        List<Board> breadcrumbsPath = boardService.getBreadcrumbsPath(boardId);
+        // 2. Service 영역에서 재귀 돌리기
+        // List<Board> breadcrumbsPath = boardService.findBreadcrumbs(board);
         BoardDetail boardDetail = new BoardDetail(board, childBoards, breadcrumbsPath);
         return new ResponseEntity<>(boardDetail, HttpStatus.OK);
     }
