@@ -36,6 +36,7 @@ public class FindBoardServiceImpl implements FindBoardService{
 
 
     @Override
+    @Transactional(readOnly = true)
     public BoardDto findBoardById(Long id) {
         Board target = getMyBean().findBoardByIdFromDB(id);
 
@@ -52,12 +53,14 @@ public class FindBoardServiceImpl implements FindBoardService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<String> findSubPageById(Long id) {
 
         return boardRepository.getChildById(id).stream().map(Board::getTitle).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Board> findBreadCrumbsById(Long id) {
         
         LinkedHashMap<Long, Board> breadCrumbsMap = new LinkedHashMap<>();
