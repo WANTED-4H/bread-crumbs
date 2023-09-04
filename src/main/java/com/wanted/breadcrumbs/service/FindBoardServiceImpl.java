@@ -20,9 +20,6 @@ public class FindBoardServiceImpl implements FindBoardService{
     private final ApplicationContext applicationContext;
     private final BoardRepository boardRepository;
 
-
-
-    //이친구가 반환될 친구임.
     @Override
     @Cacheable(value = "board")
     @Transactional(readOnly = true)
@@ -34,6 +31,7 @@ public class FindBoardServiceImpl implements FindBoardService{
 
 
     @Override
+    @Transactional(readOnly = true)
     public BoardDto findBoardById(Long id) {
         Board target = getMyBean().findBoardByIdFromDB(id);
 
@@ -50,12 +48,14 @@ public class FindBoardServiceImpl implements FindBoardService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<String> findSubPageById(Long id) {
 
         return boardRepository.getChildById(id).stream().map(Board::getTitle).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Board> findBreadCrumbsById(Long id) {
         //캐시에서 존재하면 캐시에서
         LinkedHashMap<Long, Board> breadCrumbsMap = new LinkedHashMap<>();
