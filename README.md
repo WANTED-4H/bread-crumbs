@@ -113,6 +113,10 @@ public class FindBoardServiceImpl implements FindBoardService{
 
 ---
 ### 결과정보
+
+ex) 1 페이지 > 2 페이지 > 3 페이지 로 페이지 구성이 되어있는 경우
+
+
 ![팀과제결과2](https://github.com/tjdghks1994/wanted-pre-onboarding-backend/assets/57320084/180765c8-25f0-4447-b094-1773e4824a95)
 
 ![팀과제결과3](https://github.com/tjdghks1994/wanted-pre-onboarding-backend/assets/57320084/c631bcac-8f0d-4662-b002-387bffb65e20)
@@ -121,31 +125,44 @@ public class FindBoardServiceImpl implements FindBoardService{
 
 ---
 ### 구조 설명
-먼저 게시글의 특성에 대해 곰곰히 생각해보았습니다.
+#### 테이블 구조
+   
+테이블 구조에서는 board테이블의 **기본키(PK)를 자기자신의 외래키(FK)로 가지는 Recursive한 구조**를 만들었습니다.
 
-게시글은 읽기와 수정이 잘 일어나는 객체 특성상, Read의 성능과 Update의 성능 모두를 지켜야 한다고 생각합니다.
+이를 통해 테이블은 해당 entity와 이 entity에 대한 계층 구조의 관리에만 집중할 수 있으며, 별도의 테이블을 만들어 관리하지 않아도 되는 장점이 있습니다.
+    
+또한, 이러한 구조는 계층구조의 변경이나 확장이 필요할 때 기존 테이블의 스키마를 수정하지 않고도 새로운 노드를 추가하거나 변경할 수 있습니다.
 
-Read의 성능은 Caching 방식으로 극대화 할 수 있습니다.
+<br>
 
-기존의 DB에서 Recursive만으로 조회해 오는것은, 트랜잭션 1회는 clustered Index(PK)로 B+Tree 인덱싱 탐색으로 ID 하나만 가져온다는 전제 하에 한 DBConnection 당 1000TPS를 넘기기 힘듭니다.
+#### Read와 Update 성능에 대한 최적화
 
-(서버의 자원에 따라 다릅니다만 옥타코어, 64기가 램 기준입니다.)
+게시판에서 게시글의 Read와 Update는 빈도수가 잦게 일어나는 작업 중 하나로 객체를 통해 접근하는 Read와 Update 성능을 모두 최적화해야 합니다.
 
-대용량으로 트래픽이 몰리게 되면 DB와 병목현상이 발생할 수 있습니다.
+**- Read**
 
-이 프로젝트는 모놀리식으로 구성되어 있어 Redis 같은 Inmemory DB를 추가로 사용하지 않고 써드파티로 EhCache를 통해 구성했습니다.
+현재 board테이블을 통한 단순한 DB 조회의 경우 시스템은 트래픽이 증가할 경우 DB와의 병목 현상을 유발할 수 있습니다. 
 
-하지만 spring Cache로 구성했기 때문에 차 후 Cache가 분리되어야 한다면 의존성 주입을 Redis로 변경하도록 하면됩니다.
+예를 들어, 트랜잭션 1회는 clustered Index(PK)로 B+Tree 인덱싱 탐색으로 ID 하나만 가져온다는 전제 하에 한 DBConnection 당 1000TPS를 넘기기 힘듭니다.
+    (옥타코어 64기가 램 기준)
 
-따라서 메모리 조회로 가져오는 EhCache를 통해 다른 세션에서도 조회할 수 있는 게시글을 Global Cache로 관리하게 해주어 조회 성능을 극대화하였습니다.
+따라서 Read 성능을 최적화하기 위해 Caching 방식을 도입하였습니다.
 
-차 후 조회 기능이 아닌 수정, 삭제, 등록이 일어날 시 Spring Cache 어노테이션들을 활용해 맞춰주면 된다 생각합니다.
+EhCache를 사용하여 메모리 조회로 PK(게시글 id)에 대하여 Global Cache로 관리하였습니다. 이는 조회 성능을 극대화하며, 여러 세션에서도 게시글을 공유할 수 있습니다.
+
+현재는 모놀리식 구성이라 이러한 써드파티를 사용했지만, Spring Cache로 구성했기 때문에 추후 cache 분리가 된다면 redis로 변경도 가능합니다.
+
+**- Update**
+
+Update가 빈번하게 일어나는 경우 BreadCrumbs가 자주 수정되는 것을 고려해야 합니다.
+
+이 경우에는 상위 Page가 수정된다고 하더라도 하위 Page들은 영향을 받지 않으므로, Update가 발생하면 캐시를 수정하여 재귀 호출을 최소화할 수 있는 방안을 도입하였습니다.
 
 
-그 후, Update가 빈번하게 일어나는 경우입니다.
+<br>
 
-BreadCrumbs가 수정되는 경우, 상위 ParentId인 Page만 수정이 일어나면 SubPage들은 영향을 받지 않습니다. 
 
-따라서 Update가 일어났을 시, 캐시를 수정하는 방안으로 적용하면 재귀호출 또한 줄어들 것입니다.
+### 결론
 
-Content가 수정되는 경우는 큰 문제가 없으니 넘어가도록 하겠습니다.
+---
+위와 같은 방식을 통해 <code class="notranslate">BreadCrumbs가 추가되더라도 각각의 테이블을 효율적으로 관리할 수 있으며, Caching을 사용하여 성능 최적화</code> 가 가능합니다.
