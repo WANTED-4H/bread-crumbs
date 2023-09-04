@@ -10,7 +10,7 @@
   </select>
 
   <select id="getChildById" parameterType="Long" resultType="com.wanted.breadcrumbs.entity.board.Board">
-    SELECT * FROM board b JOIN board c ON b.id = c.parent_id WHERE b.id = #{id}
+    SELECT c.id, c.contents, c.parent_id, c.title FROM board b JOIN board c ON b.id = c.parent_id WHERE b.id = #{id}
   </select>
 
 </mapper>
