@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-@Configuration
-@MapperScan("com.wanted.breadcrumbs.mapper")
+//@Configuration
+//@MapperScan("com.wanted.breadcrumbs.mapper")
 public class MyBatisConfig {
 
     @Bean
