@@ -4,6 +4,7 @@
 김현진, 민승현, 박성환, 임상현
 
 ---
+
 ### 요구사항
 **페이지 정보 조회 API**: 특정 페이지의 정보를 조회할 수 있는 API를 구현
 
@@ -13,6 +14,13 @@
 ---
 ### 테이블 구조
 <img width="282" alt="스크린샷 2023-09-04 오후 7 48 36" src="https://github.com/tjdghks1994/wanted-pre-onboarding-backend/assets/57320084/4181dad7-c1d9-42b1-9932-dfe0faeebb4e">
+
+---
+
+### 시퀀스 다이어그램
+
+![KakaoTalk_Photo_2023-09-05-08-58-56](https://github.com/WANTED-4H/bread-crumbs/assets/116651434/55e6bd55-3849-4996-8bbb-9f6edeb47876)
+
 
 ---
 ### 비즈니스 로직
